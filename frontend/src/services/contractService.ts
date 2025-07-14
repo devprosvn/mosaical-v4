@@ -139,15 +139,60 @@ export class ContractService {
     }
   }
 
+  // Lấy thông tin chi tiết của một NFT
+  async getNFTDetails(collectionAddress: string, tokenId: number | string) {
+    try {
+      const nftContract = new Contract(
+        collectionAddress,
+        [
+          "function tokenURI(uint256 tokenId) view returns (string)",
+          "function name() view returns (string)",
+          "function symbol() view returns (string)",
+          "function ownerOf(uint256 tokenId) view returns (address)"
+        ],
+        this.provider
+      );
+
+      const [tokenURI, name, symbol, owner] = await Promise.all([
+        nftContract.tokenURI(tokenId).catch(() => ''),
+        nftContract.name().catch(() => 'Unknown'),
+        nftContract.symbol().catch(() => 'UNK'),
+        nftContract.ownerOf(tokenId).catch(() => '')
+      ]);
+
+      return {
+        tokenId: tokenId.toString(),
+        tokenURI,
+        collectionName: name,
+        collectionSymbol: symbol,
+        owner,
+        collectionAddress
+      };
+    } catch (error) {
+      console.error('Error getting NFT details:', error);
+      throw error;
+    }
+  }
+
   // Deposit NFT into vault
   async depositNFT(collectionAddress: string, tokenId: number | string) {
-    if (!this.nftVault || !this.mockGameNFT || !this.signer) 
+    if (!this.nftVault || !this.signer) 
       throw new Error('Contracts not initialized or signer not available');
     
     try {
+      // Tạo contract instance cho collection cụ thể
+      const nftContract = new Contract(
+        collectionAddress,
+        [
+          "function approve(address to, uint256 tokenId) external",
+          "function ownerOf(uint256 tokenId) view returns (address)"
+        ],
+        this.signer
+      );
+
       // First approve the vault to transfer the NFT
       console.log(`Approving NFT transfer: Collection ${collectionAddress}, Token ID ${tokenId}`);
-      const approveTx = await this.mockGameNFT.approve(CONTRACT_ADDRESSES.NFTVault, tokenId);
+      const approveTx = await nftContract.approve(CONTRACT_ADDRESSES.NFTVault, tokenId);
       await approveTx.wait();
       
       console.log('Approval successful, now depositing NFT...');
@@ -416,4 +461,4 @@ export class ContractService {
       return false;
     }
   }
-} 
+}

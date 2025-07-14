@@ -1,12 +1,19 @@
 import { Component, createSignal, createEffect, For, Show } from 'solid-js';
 import { useWeb3 } from '../stores/Web3Store';
 import { useContracts } from '../hooks/useContracts';
+import { getUserNFTs } from '../services/nftService';
 import { CONTRACT_ADDRESSES } from '../constants/contracts';
-import { Contract } from 'ethers';
 
 interface NFTCardProps {
-  tokenId: string;
-  onDeposit: (tokenId: string) => void;
+  nft: {
+    tokenId: string;
+    title: string;
+    description: string;
+    image: string;
+    collectionAddress: string;
+    collectionName: string;
+  };
+  onDeposit: (tokenId: string, collectionAddress: string) => void;
 }
 
 // Component to display a single NFT card
@@ -18,8 +25,8 @@ const NFTCardItem: Component<NFTCardProps> = (props) => {
         <div class="hexagon-container" style={{ "margin": '1rem auto 0.5rem' }}>
           <div class="hexagon">
             <img 
-              src={`https://via.placeholder.com/300/0a0a1a/00f6ff?text=NFT+%23${props.tokenId}`}
-              alt={`NFT #${props.tokenId}`}
+              src={props.nft.image}
+              alt={props.nft.title}
               loading="lazy"
             />
           </div>
@@ -27,26 +34,27 @@ const NFTCardItem: Component<NFTCardProps> = (props) => {
         
         <div class="card-body text-center" style={{ "padding": '1rem' }}>
           <h5 class="text-neon mb-2" style={{ "font-family": 'var(--font-primary)' }}>
-            Test Game NFT #{props.tokenId}
+            {props.nft.title}
           </h5>
           <p class="text-secondary mb-3" style={{ "font-size": '0.9rem' }}>
-            GameFi NFT ready for collateralization
+            {props.nft.description}
           </p>
           
           <div class="mb-3">
-            <div class="badge bg-info mb-2">Token #{props.tokenId}</div>
+            <div class="badge bg-info mb-2">Token #{props.nft.tokenId}</div>
+            <div class="badge bg-success mb-2">{props.nft.collectionName}</div>
             <div class="badge bg-secondary" style={{ 
               "font-family": 'var(--font-mono)', 
               "font-size": '0.7rem',
               "display": 'block'
             }}>
-              {CONTRACT_ADDRESSES.MockGameNFT.substring(0, 6)}...{CONTRACT_ADDRESSES.MockGameNFT.substring(CONTRACT_ADDRESSES.MockGameNFT.length - 4)}
+              {props.nft.collectionAddress.substring(0, 6)}...{props.nft.collectionAddress.substring(props.nft.collectionAddress.length - 4)}
             </div>
           </div>
           
           <button 
             class="btn btn-neon-cyan w-100" 
-            onClick={() => props.onDeposit(props.tokenId)}
+            onClick={() => props.onDeposit(props.nft.tokenId, props.nft.collectionAddress)}
           >
             <i class="bi bi-safe me-2"></i>
             DEPOSIT
@@ -65,7 +73,7 @@ const MyNFTs: Component<MyNFTsProps> = (props) => {
   const web3 = useWeb3();
   const { contractService } = useContracts();
   
-  const [ownedNFTs, setOwnedNFTs] = createSignal<{tokenId: string}[]>([]);
+  const [ownedNFTs, setOwnedNFTs] = createSignal<any[]>([]);
   const [isLoading, setIsLoading] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
 
@@ -82,38 +90,8 @@ const MyNFTs: Component<MyNFTsProps> = (props) => {
       setOwnedNFTs([]); 
 
       try {
-        // 1. Create contract instance to interact with MockGameNFT
-        const contract = new Contract(
-          CONTRACT_ADDRESSES.MockGameNFT, 
-          [
-            "function balanceOf(address owner) view returns (uint256)",
-            "function ownerOf(uint256 tokenId) view returns (address)"
-          ], 
-          provider
-        );
-        const userNFTs = [];
-
-        // 2. Get total NFTs owned by the user
-        const balance = await contract.balanceOf(account);
-        if (balance.toString() === "0") {
-          setIsLoading(false);
-          return;
-        }
-
-        // 3. Scan through token IDs to find user's NFTs
-        // Simple approach for MVP, not optimized for large collections
-        for (let i = 0; userNFTs.length < parseInt(balance.toString()); i++) {
-          try {
-            const owner = await contract.ownerOf(i);
-            if (owner.toLowerCase() === account.toLowerCase()) {
-              // Found one of the user's NFTs!
-              userNFTs.push({ tokenId: i.toString() });
-            }
-          } catch (e) {
-            // Skip "token doesn't exist" errors as we're scanning
-            if (i > 100) break; // Set a scan limit to avoid infinite loop
-          }
-        }
+        // Sử dụng service mới để lấy NFTs
+        const userNFTs = await getUserNFTs(provider, account);
         
         setOwnedNFTs(userNFTs);
 
@@ -131,16 +109,18 @@ const MyNFTs: Component<MyNFTsProps> = (props) => {
   });
 
   // Handle depositing an NFT
-  const handleDepositNFT = async (tokenId: string) => {
+  const handleDepositNFT = async (tokenId: string, collectionAddress?: string) => {
     if (!contractService) {
       alert('Contract service not available');
       return;
     }
 
     try {
-      const collectionAddress = CONTRACT_ADDRESSES.MockGameNFT;
+      // Tìm NFT để lấy collection address
+      const nft = ownedNFTs().find(n => n.tokenId === tokenId);
+      const collection = collectionAddress || nft?.collectionAddress || CONTRACT_ADDRESSES.MockGameNFT;
       
-      await contractService.depositNFT(collectionAddress, tokenId);
+      await contractService.depositNFT(collection, tokenId);
       alert('NFT successfully deposited!');
       
       // Notify parent component to refresh vault assets
@@ -161,7 +141,7 @@ const MyNFTs: Component<MyNFTsProps> = (props) => {
           <span class="visually-hidden">Loading...</span>
         </div>
         <p class="mt-3 text-neon" style={{ "font-family": 'var(--font-primary)' }}>
-          Scanning your NFTs on-chain...
+          Fetching your NFTs from supported collections...
         </p>
       </div>
     );
@@ -193,7 +173,7 @@ const MyNFTs: Component<MyNFTsProps> = (props) => {
       <div class="alert alert-info text-center" style={{ "padding": '2rem' }}>
         <i class="bi bi-collection" style={{ "font-size": '3rem', "margin-bottom": '1rem' }}></i>
         <h4 class="text-neon">No NFTs Found</h4>
-        <p class="mb-0">You do not own any NFTs from the supported collection.</p>
+        <p class="mb-0">You don't own any NFTs in the supported collections yet.</p>
       </div>
     );
   }
@@ -214,7 +194,7 @@ const MyNFTs: Component<MyNFTsProps> = (props) => {
         <For each={ownedNFTs()}>
           {(nft) => (
             <NFTCardItem 
-              tokenId={nft.tokenId} 
+              nft={nft}
               onDeposit={handleDepositNFT}
             />
           )}

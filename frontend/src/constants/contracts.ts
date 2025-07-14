@@ -7,6 +7,16 @@ export const CONTRACT_ADDRESSES = {
   MockGameNFT: "0x9BD14Eb8581F1B47f01836657BFe572D799610D9" // Replace with actual address when available
 };
 
+// Danh sách các collection NFT được hỗ trợ
+export const SUPPORTED_NFT_COLLECTIONS = [
+  {
+    address: "0x9BD14Eb8581F1B47f01836657BFe572D799610D9",
+    name: "Mock Game NFT",
+    symbol: "TGNFT",
+    type: "ERC721"
+  }
+  // Thêm các collection khác ở đây khi cần
+];
 // Supported networks
 export const SUPPORTED_NETWORKS = {
   // Saga devpros
