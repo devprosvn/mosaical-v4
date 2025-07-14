@@ -1,0 +1,132 @@
+/* Mosaical Design System - Glassmorphism + Cyberpunk + Mosaic */
+
+/* Color Palette */
+:root {
+  /* Primary Background - Dark cyberpunk base */
+  --primary-bg-1: #0a0a1a;
+  --primary-bg-2: #000010;
+  --primary-bg-3: #0d0d1f;
+  --primary-bg-4: #1a1a2e;
+  --primary-bg-5: #16213e;
+
+  /* Glassmorphism backgrounds */
+  --glass-bg-primary: rgba(10, 10, 25, 0.4);
+  --glass-bg-secondary: rgba(26, 26, 46, 0.6);
+  --glass-bg-modal: rgba(0, 0, 16, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-border-hover: rgba(255, 255, 255, 0.4);
+
+  /* Cyberpunk Neon Colors */
+  --neon-cyan: #00f6ff;
+  --neon-magenta: #ff00ff;
+  --neon-yellow: #ffd900;
+  --neon-green: #39ff14;
+  --neon-orange: #ff6600;
+  --neon-purple: #bf00ff;
+
+  /* Mosaic Colors - Lower saturation for harmony */
+  --mosaic-blue: #4a90e2;
+  --mosaic-purple: #9b59b6;
+  --mosaic-teal: #1abc9c;
+  --mosaic-orange: #e67e22;
+  --mosaic-red: #e74c3c;
+  --mosaic-green: #27ae60;
+
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-muted: #a0a0a0;
+  --text-neon: var(--neon-cyan);
+
+  /* Default assignments */
+  --primary-bg: var(--primary-bg-1);
+  --glass-bg: var(--glass-bg-primary);
+  --primary-accent: var(--neon-cyan);
+  --secondary-accent: var(--neon-magenta);
+  --primary-text: var(--text-primary);
+  --secondary-text: var(--text-secondary);
+  --border-color: var(--glass-border);
+  --link-color: var(--neon-cyan);
+
+  /* Typography */
+  --font-primary: 'Orbitron', 'Inter', sans-serif;
+  --font-secondary: 'Inter', 'Roboto Mono', monospace;
+  --font-mono: 'Roboto Mono', monospace;
+
+  /* Effects */
+  --blur-amount: 20px;
+  --glow-size: 0 0 20px;
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Bootstrap overrides */
+  --bs-body-font-family: var(--font-secondary);
+  --bs-body-bg: var(--primary-bg);
+  --bs-body-color: var(--primary-text);
+  --bs-primary: var(--primary-accent);
+  --bs-secondary: var(--secondary-accent);
+  --bs-border-radius: 0.75rem;
+}
+
+/* Cyberpunk Gradient Buttons */
+.btn-neon-cyan {
+  background: linear-gradient(45deg, var(--neon-cyan), rgba(0, 246, 255, 0.7));
+  border: 1px solid var(--neon-cyan);
+  color: var(--primary-bg-1);
+  font-weight: 600;
+  text-shadow: none;
+  box-shadow: var(--glow-size) var(--neon-cyan);
+  transition: all var(--transition-fast);
+}
+
+.btn-neon-cyan:hover {
+  background: var(--neon-cyan);
+  box-shadow: var(--glow-size) var(--neon-cyan), inset 0 0 20px rgba(0, 246, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-neon-magenta {
+  background: linear-gradient(45deg, var(--neon-magenta), rgba(255, 0, 255, 0.7));
+  border: 1px solid var(--neon-magenta);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: var(--glow-size) var(--neon-magenta);
+  transition: all var(--transition-fast);
+}
+
+.btn-neon-magenta:hover {
+  background: var(--neon-magenta);
+  box-shadow: var(--glow-size) var(--neon-magenta), inset 0 0 20px rgba(255, 0, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-neon-yellow {
+  background: linear-gradient(45deg, var(--neon-yellow), rgba(255, 217, 0, 0.7));
+  border: 1px solid var(--neon-yellow);
+  color: var(--primary-bg-1);
+  font-weight: 600;
+  box-shadow: var(--glow-size) var(--neon-yellow);
+  transition: all var(--transition-fast);
+}
+
+.btn-neon-yellow:hover {
+  background: var(--neon-yellow);
+  box-shadow: var(--glow-size) var(--neon-yellow), inset 0 0 20px rgba(255, 217, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Legacy gradient button for compatibility */
+.btn-gradient {
+  background: linear-gradient(45deg, var(--primary-accent), var(--secondary-accent));
+  border: 1px solid var(--primary-accent);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: var(--glow-size) var(--primary-accent);
+  transition: all var(--transition-fast);
+}
+
+.btn-gradient:hover {
+  box-shadow: var(--glow-size) var(--primary-accent), inset 0 0 20px rgba(0, 246, 255, 0.3);
+  transform: translateY(-2px);
+}

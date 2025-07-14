@@ -1,0 +1,76 @@
+/* ----------------------------------------------------------
+   _legacy-react.scss – Imported helpers from previous React
+   ---------------------------------------------------------- */
+
+/* Base typography & rendering improvements */
+:root {
+  line-height: 1.5;
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+
+  /* Preserve high-quality text rendering across browsers */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Links */
+a {
+  font-weight: 500;
+  color: var(--link-color);
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: var(--secondary-accent);
+}
+
+/* Generic button appearance (non-Bootstrap buttons) */
+button {
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--primary-bg);
+  color: var(--primary-text);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: var(--secondary-accent);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Utility card */
+.card {
+  padding: 2rem;
+}
+
+/* Misc demo helpers (e.g., rotating logos) */
+@keyframes logo-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.logo {
+  height: 6rem;
+  padding: 1.5rem;
+  will-change: filter;
+  transition: filter 300ms;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2rem var(--primary-accent));
+}
+
+.logo.react:hover {
+  filter: drop-shadow(0 0 2rem #61dafb);
+} 
